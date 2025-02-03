@@ -29,7 +29,7 @@ Installation & Setup
 
 Clone the repository:
 
-git clone https://github.com/yourusername/geno.git
+https://github.com/Wilfychep/Geno.git
 cd geno
 
 Install dependencies:
