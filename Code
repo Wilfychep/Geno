@@ -1,0 +1,32 @@
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.19;
+
+import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/utils/cryptography/MerkleProof.sol";
+
+contract Geno is Ownable {
+    struct GenomicData {
+        bytes32 merkleRoot;
+        address owner;
+    }
+
+    mapping(address => GenomicData) public genomicRecords;
+
+    event GenomicDataStored(address indexed user, bytes32 merkleRoot);
+    event GenomicDataVerified(address indexed user, bool isValid);
+
+    function storeGenomicData(bytes32 _merkleRoot) external {
+        genomicRecords[msg.sender] = GenomicData({
+            merkleRoot: _merkleRoot,
+            owner: msg.sender
+        });
+        emit GenomicDataStored(msg.sender, _merkleRoot);
+    }
+
+    function verifyGenomicData(address _user, bytes32[] calldata _proof, bytes32 _leaf) external view returns (bool) {
+        require(genomicRecords[_user].owner == _user, "User has no stored genomic data");
+        bool isValid = MerkleProof.verify(_proof, genomicRecords[_user].merkleRoot, _leaf);
+        emit GenomicDataVerified(_user, isValid);
+        return isValid;
+    }
+}
